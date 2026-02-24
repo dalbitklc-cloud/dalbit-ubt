@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+
 <style>
   body {
     font-family: 'Noto Sans KR', sans-serif;
@@ -518,6 +519,13 @@ let currentAudioIdx = 0;
 
 function loadQuestion() {
   const q = questions[current];
+  
+  // Failsafe: Kung sakaling may error sa data, hindi mag-stuck ang screen
+  if (!q) {
+    document.getElementById("question").innerText = "Error: Question not found.";
+    return;
+  }
+
   const audioBox = document.getElementById("audioBox");
   const player = document.getElementById("audioPlayer");
   const msg = document.getElementById("audioMsg");
@@ -538,7 +546,7 @@ function loadQuestion() {
     img.style.display = "none";
   }
 
-  // --- LISTENING LOGIC UPDATED ---
+  // --- IMPROVED LISTENING LOGIC ---
   if(q.type === "listening") {
     audioBox.style.display = "block";
     currentAudioIdx = 0;
@@ -547,9 +555,10 @@ function loadQuestion() {
     if(q.optionAudios) audioSequence = audioSequence.concat(q.optionAudios);
 
     player.src = audioSequence[0];
-    player.controls = false; // Itinatago ang play button para hindi ma-click ng user
+    player.controls = false; 
     msg.innerText = "🔊 Playing Audio (1/2)";
 
+    // Sinusubukan i-play ang audio, pero hindi nito hihinto ang buong script kung mag-fail
     player.play().catch(() => {
       msg.innerText = "⚠️ Click anywhere to enable audio";
     });
@@ -567,15 +576,16 @@ function loadQuestion() {
             player.src = audioSequence[0];
             player.play();
             msg.innerText = "🔊 Playing Audio (2/2)";
-          }, 2000); // 2 segundong pagitan bago ang pangalawang play
+          }, 2000); 
         } else {
           msg.innerText = "🚫 Audio Finished (No Replay Allowed)";
-          player.src = ""; // Tinatanggal ang source para hindi na ma-play ulit
-          player.controls = false; // Sinisiguradong tago ang controls
+          player.src = ""; 
+          player.controls = false; 
         }
       }
     };
   } else {
+    // READING MODE: Pinapatay ang lahat ng audio logic
     audioBox.style.display = "none";
     player.pause();
     player.src = "";
@@ -635,17 +645,16 @@ setInterval(() => {
 }, 1000);
 
 function startQuiz() {
+  // 1. Itago agad ang start screen
   document.getElementById("startScreen").style.display = "none";
-  const player = document.getElementById("audioPlayer");
   
-  // Mag-load ng empty sound para ma-unlock ang audio context ng browser
+  // 2. I-load agad ang text at UI ng Question 1
+  loadQuestion();
+
+  // 3. Subukan i-unlock ang audio sa background
+  const player = document.getElementById("audioPlayer");
   player.src = "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=";
-  player.play().then(() => {
-    loadQuestion();
-  }).catch(e => {
-    console.log("Audio unlock failed:", e);
-    loadQuestion();
-  });
+  player.play().catch(e => console.log("Audio waiting for interaction..."));
 }
 </script>
 
