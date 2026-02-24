@@ -1,0 +1,15 @@
+{
+  "name": "Dalbit EPS Simulator",
+  "short_name": "DalbitUBT",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#000080",
+  "theme_color": "#E1AD01",
+  "icons": [
+    {
+      "src": "https://uploads.onecompiler.io/44bzqanza/44bzq9w9h/Dalbit%20Logo-Circle.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
